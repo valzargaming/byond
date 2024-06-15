@@ -10,6 +10,10 @@ The `Byond` PHP class is designed to interact with the website for BYOND (Build 
 - Retrieve player details such as gender, join date, description, and homepage from BYOND pages.
 - Designed to be used in combination with a caching system to enhance performance.
 
+## Implementation
+
+The `Byond` class implements the `ByondInterface` and uses the `ByondTrait` to provide its functionality.
+
 ## Installation
 
 Install the package via Composer:
@@ -31,25 +35,25 @@ use Byond\Byond;
 // Convert BYOND timestamp to Unix timestamp
 $byondTimestamp = 1234567890;
 $unixTimestamp = Byond::convertToUnixFromByond($byondTimestamp);
-echo "Unix Timestamp: " . $unixTimestamp;
+echo "Unix Timestamp: " . $unixTimestamp . PHP_EOL;
 
 // Convert BYOND timestamp to ISO 8601 format
 $isoTimestamp = Byond::convertToTimestampFromByond($byondTimestamp);
-echo "ISO 8601 Timestamp: " . $isoTimestamp;
+echo "ISO 8601 Timestamp: " . $isoTimestamp . PHP_EOL;
 
 // Parse player information from a BYOND page
 $pageContent = Byond::getProfilePage('valithor');
-$key = Byond::__parseKey($pageContent);
-$gender = Byond::__parseGender($pageContent);
-$joined = Byond::__parseJoined($pageContent);
-$description = Byond::__parseDesc($pageContent);
-$homePage = Byond::__parseHomePage($pageContent);
+$key = Byond::parseKey($pageContent);
+$gender = Byond::parseGender($pageContent);
+$joined = Byond::parseJoined($pageContent);
+$description = Byond::parseDesc($pageContent);
+$homePage = Byond::parseHomePage($pageContent);
 
-echo "Key: " . $gender;
-echo "Gender: " . $gender;
-echo "Joined: " . $joined;
-echo "Description: " . $description;
-echo "Home Page: " . $homePage;
+echo "Key: " . $key . PHP_EOL;
+echo "Gender: " . $gender . PHP_EOL;
+echo "Joined: " . $joined . PHP_EOL;
+echo "Description: " . $description . PHP_EOL;
+echo "Home Page: " . $homePage . PHP_EOL;
 ?>
 ```
 

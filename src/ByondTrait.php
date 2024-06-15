@@ -1,5 +1,4 @@
-<?php
-namespace Byond;
+<?php declare(strict_types=1);
 
 /*
  * This file is a part of the Civ13 project.
@@ -7,11 +6,9 @@ namespace Byond;
  * Copyright (c) 2024-present Valithor Obsidion <valithor@valzargaming.com>
  */
 
-/**
- * This class provides functionality related to BYOND (Build Your Own Net Dream) game development.
- * It can be used to interact with BYOND servers and retrieve information about players and their accounts.
- */
-class Byond
+namespace Byond;
+
+trait ByondTrait
 {
     /**
      * The Unix timestamp representing the BYOND epoch.
@@ -19,7 +16,7 @@ class Byond
      * It is defined as January 1, 2000, 00:00:00 UTC.
      * This constant represents the BYOND epoch as a Unix timestamp.
      */
-    const int BYOND_EPOCH_AS_UNIX_TS = 946684800;
+    const float|int BYOND_EPOCH_AS_UNIX_TS = 946684800;
 
     /**
      * The base URL for the BYOND website.
@@ -49,7 +46,35 @@ class Byond
      */
     const string CENTCOM_URL = 'https://centcom.melonmesa.com';
 
-    public static function convertToUnixFromByond(int $byond_timestamp): int
+    /**
+     * Converts a timestamp in ISO 8601 format to a BYOND timestamp in deciseconds.
+     *
+     * @param string $iso_timestamp The timestamp in ISO 8601 format to convert.
+     * @return float The converted BYOND timestamp in deciseconds.
+     */
+    public static function convertToByondFromTimestamp(string $iso_timestamp): float
+    {
+        return self::convertToByondFromUnix(strtotime($iso_timestamp));
+    }
+
+    /**
+     * Converts a Unix timestamp to a BYOND timestamp in deciseconds.
+     *
+     * @param float|int $unix_timestamp The Unix timestamp to convert.
+     * @return float The converted BYOND timestamp in deciseconds.
+     */
+    public static function convertToByondFromUnix(float|int $unix_timestamp): float
+    {
+        return round(($unix_timestamp - self::BYOND_EPOCH_AS_UNIX_TS) * 10);
+    }
+
+    /**
+     * Converts a Byond timestamp to a Unix timestamp.
+     *
+     * @param float|int $byond_timestamp The Byond timestamp to convert.
+     * @return float The converted Unix timestamp.
+     */
+    public static function convertToUnixFromByond(float|int $byond_timestamp): float
     {
         return ($byond_timestamp * 0.1) + self::BYOND_EPOCH_AS_UNIX_TS;
     }
@@ -57,34 +82,12 @@ class Byond
     /**
      * Converts a Byond timestamp to a Unix timestamp and returns it in ISO 8601 format.
      *
-     * @param int $byond_timestamp The Byond timestamp to convert.
+     * @param float|int $byond_timestamp The Byond timestamp to convert.
      * @return string The converted timestamp in ISO 8601 format.
      */
-    public static function convertToTimestampFromByond(int $byond_timestamp): string
+    public static function convertToTimestampFromByond(float|int $byond_timestamp): string
     {
-        return date('c', self::convertToUnixFromByond($byond_timestamp));
-    }
-
-    /**
-     * Converts a Unix timestamp to a BYOND timestamp in deciseconds.
-     *
-     * @param int $unix_timestamp The Unix timestamp to convert.
-     * @return int The converted BYOND timestamp in deciseconds.
-     */
-    public static function convertToByondFromUnix(int $unix_timestamp): int
-    {
-        return round(($unix_timestamp - self::BYOND_EPOCH_AS_UNIX_TS) * 10);
-    }
-
-    /**
-     * Converts a timestamp in ISO 8601 format to a BYOND timestamp in deciseconds.
-     *
-     * @param string $iso_timestamp The timestamp in ISO 8601 format to convert.
-     * @return int The converted BYOND timestamp in deciseconds.
-     */
-    public static function convertToByondFromTimestamp(string $iso_timestamp): int
-    {
-        return self::convertToByondFromUnix(strtotime($iso_timestamp));
+        return date('c', intval(self::convertToUnixFromByond($byond_timestamp)));
     }
 
     /**
@@ -139,7 +142,7 @@ class Byond
     public static function getKey(string $ckey): string|false
     {
         if (! $page = self::getProfilePage($ckey)) return false;
-        return self::__parseKey($page);
+        return self::parseKey($page);
     }
 
     /**
@@ -151,7 +154,7 @@ class Byond
     public static function getGender(string $ckey): string|false
     {
         if (! $page = self::getProfilePage($ckey)) return false;
-        return self::__parseGender($page);
+        return self::parseGender($page);
     }
 
     /**
@@ -163,7 +166,7 @@ class Byond
     public static function getJoined(string $ckey): string|false
     {
         if (! $page = self::getProfilePage($ckey)) return false;
-        return self::__parseJoined($page);
+        return self::parseJoined($page);
     }
 
     /**
@@ -175,7 +178,7 @@ class Byond
     public static function getDesc(string $ckey): string|false
     {
         if (! $page = self::getProfilePage($ckey)) return false;
-        return self::__parseDesc($page);
+        return self::parseDesc($page);
     }
 
     /**
@@ -187,7 +190,7 @@ class Byond
     public static function getHomePage(string $ckey): string|false
     {
         if (! $page = self::getProfilePage($ckey)) return false;
-        return self::__parseHomePage($page);
+        return self::parseHomePage($page);
     }
 
     /**
@@ -196,9 +199,9 @@ class Byond
      * @param string $page The Byond page content.
      * @return string|false The key for the player, or false if it cannot be retrieved.
      */
-    public static function __parseKey(string $page): string|false
+    public static function parseKey(string $page): string|false
     {
-        return self::__parse($page, 'key = "');
+        return self::parse($page, 'key = "');
     }
 
     /**
@@ -207,9 +210,9 @@ class Byond
      * @param string $page The Byond page content.
      * @return string|false The gender of the player, or false if it cannot be retrieved.
      */
-    public static function __parseGender(string $page): string|false
+    public static function parseGender(string $page): string|false
     {
-        return self::__parse($page, 'gender = "');
+        return self::parse($page, 'gender = "');
     }
 
     /**
@@ -218,9 +221,9 @@ class Byond
      * @param string $page The Byond page content.
      * @return string|false The joined for of the player, or false if it cannot be retrieved.
      */
-    public static function __parseJoined(string $page): string|false
+    public static function parseJoined(string $page): string|false
     {
-        return self::__parse($page, 'joined = "');
+        return self::parse($page, 'joined = "');
     }
 
     /**
@@ -230,9 +233,9 @@ class Byond
      * @param string $page The Byond page content.
      * @return string|false The description for the player, or false if it cannot be retrieved.
      */
-    public static function __parseDesc(string $page): string|false
+    public static function parseDesc(string $page): string|false
     {
-        return self::__parse($page, 'desc = "');
+        return self::parse($page, 'desc = "');
     }
 
     /**
@@ -242,9 +245,9 @@ class Byond
      * @param string $page The Byond page content.
      * @return string|false The home page URL for the player, or false if not found.
      */
-    public static function __parseHomePage(string $page): string|false
+    public static function parseHomePage(string $page): string|false
     {
-        return self::__parse($page, 'home_page = "');
+        return self::parse($page, 'home_page = "');
     }
 
     /**
@@ -254,7 +257,7 @@ class Byond
      * @param string $search_string The string to search for in the page.
      * @return string|false The parsed field if found, or false if not found.
      */
-    private static function __parse(string $page, string $search_string): string|false
+    public static function parse(string $page, string $search_string): string|false
     {
         $page = preg_replace('/\\\(.)/', '', $page); // Escape characters and the following escaped characters must be removed to prevent issues with parsing.
         if (($strpos = strpos($page , $search_string)) === false) return false;

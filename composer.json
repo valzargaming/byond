@@ -1,21 +1,20 @@
 {
     "name": "valzargaming/byond",
     "description": "A PHP class for interacting with BYOND (Build Your Own Net Dream) servers, providing functionalities to retrieve player information and manage game-related data. Designed to be used in conjunction with a caching system for optimal performance.",
-    "type": "library",
-    "require": {
-        "php": ">=7.4"
-    },
-    "autoload": {
-        "psr-4": {
-            "Byond\\": "src/Byond/"
-        }
-    },
-    "license": "MIT",
+	"keywords": ["byond"],
+	"license": "MIT",
     "authors": [
         {
             "name": "Valithor Obsidion",
             "email": "valithor@valzargaming.com"
         }
     ],
-    "minimum-stability": "stable"
+	"require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Byond\\": "src/"
+        }
+    }
 }
