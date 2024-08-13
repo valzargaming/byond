@@ -99,18 +99,19 @@ trait ByondTrait
      */
     public static function bansearch_centcom(string $ckey, bool $prettyprint = true): string|false
     {
-        $json = false;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, self::CENTCOM_URL . '/ban/search/' . urlencode($ckey));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPGET, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+        $ch = curl_init(self::CENTCOM_URL . '/ban/search/' . urlencode($ckey));
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPGET => true,
+            CURLOPT_TIMEOUT => 5,
+            CURLOPT_CONNECTTIMEOUT => 2,
+        ]);
         $response = curl_exec($ch);
-        curl_close($ch);
-        if (! $response) return false;
-        if (! $json = $prettyprint ? json_encode(json_decode($response), JSON_PRETTY_PRINT) : $response) return false;
-        return $json;
+        if ($response === false) return false;
+
+        $json = json_decode($response);
+        if (json_last_error() !== JSON_ERROR_NONE) return false;
+        return $prettyprint ? json_encode($json, JSON_PRETTY_PRINT) : $response;
     }
 
     /**
@@ -121,16 +122,14 @@ trait ByondTrait
      */
     public static function getProfilePage(string $ckey): string|false 
     {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, self::MEMBERS . urlencode($ckey) . '?format=text');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // return the page as a string
-        curl_setopt($ch, CURLOPT_HTTPGET, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-        $page = curl_exec($ch);
-        curl_close($ch);
-        if ($page) return $page;
-        return false;
+        $ch = curl_init(self::MEMBERS . urlencode($ckey) . '?format=text');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPGET => true,
+            CURLOPT_TIMEOUT => 5,
+            CURLOPT_CONNECTTIMEOUT => 2,
+        ]);
+        return curl_exec($ch);
     }
 
     /**
@@ -141,8 +140,7 @@ trait ByondTrait
      */
     public static function getKey(string $ckey): string|false
     {
-        if (! $page = self::getProfilePage($ckey)) return false;
-        return self::parseKey($page);
+        return ($page = self::getProfilePage($ckey)) ? self::parseKey($page) : false;
     }
 
     /**
@@ -153,8 +151,7 @@ trait ByondTrait
      */
     public static function getGender(string $ckey): string|false
     {
-        if (! $page = self::getProfilePage($ckey)) return false;
-        return self::parseGender($page);
+        return ($page = self::getProfilePage($ckey)) ? self::parseGender($page) : false;
     }
 
     /**
@@ -165,8 +162,7 @@ trait ByondTrait
      */
     public static function getJoined(string $ckey): string|false
     {
-        if (! $page = self::getProfilePage($ckey)) return false;
-        return self::parseJoined($page);
+        return ($page = self::getProfilePage($ckey)) ? self::parseJoined($page) : false;
     }
 
     /**
@@ -177,8 +173,7 @@ trait ByondTrait
      */
     public static function getDesc(string $ckey): string|false
     {
-        if (! $page = self::getProfilePage($ckey)) return false;
-        return self::parseDesc($page);
+        return ($page = self::getProfilePage($ckey)) ? self::parseDesc($page) : false;
     }
 
     /**
@@ -189,8 +184,7 @@ trait ByondTrait
      */
     public static function getHomePage(string $ckey): string|false
     {
-        if (! $page = self::getProfilePage($ckey)) return false;
-        return self::parseHomePage($page);
+        return ($page = self::getProfilePage($ckey)) ? self::parseHomePage($page) : false;
     }
 
     /**

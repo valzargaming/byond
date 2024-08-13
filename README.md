@@ -54,7 +54,6 @@ echo "Gender: " . $gender . PHP_EOL;
 echo "Joined: " . $joined . PHP_EOL;
 echo "Description: " . $description . PHP_EOL;
 echo "Home Page: " . $homePage . PHP_EOL;
-?>
 ```
 
 ## Contributing
