@@ -15,6 +15,8 @@ interface ByondInterface
     public static function convertToUnixFromByond(float|int $byond_timestamp): float;
     public static function convertToTimestampFromByond(float|int $byond_timestamp): string;
     public static function bansearch_centcom(string $ckey, bool $prettyprint = true): string|false;
+    public static function isValidCkey(string $ckey, string $page = ''): bool;
+    public static function isValidProfilePage(string $page): bool;
     public static function getProfilePage(string $ckey): string|false;
     public static function getKey(string $ckey): string|false;
     public static function getGender(string $ckey): string|false;

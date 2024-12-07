@@ -114,6 +114,23 @@ trait ByondTrait
         return $prettyprint ? json_encode($json, JSON_PRETTY_PRINT) : $response;
     }
 
+    public static function isValidCkey(string $ckey, string $page = ''): bool
+    {
+        if (! $page && ! $page = self::getProfilePage($ckey)) return false;
+        return self::isValidProfilePage($page);
+    }
+    
+    /**
+     * Verifies if the profile page content is valid.
+     *
+     * @param string $page The profile page content.
+     * @return bool True if the page is valid, false otherwise.
+     */
+    public static function isValidProfilePage(string $page): bool
+    {
+        return str_starts_with($page, 'general');
+    }
+
     /**
      * Retrieves the profile page of a user based on their ckey.
      *
