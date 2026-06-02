@@ -47,6 +47,13 @@ trait ByondTrait
     const string CENTCOM_URL = 'https://centcom.melonmesa.com';
 
     /**
+     * The User-Agent header to send with outbound HTTP requests.
+     *
+     * @var string
+     */
+    const string DEFAULT_USER_AGENT = 'ByondPHP/2.2 (+https://github.com/valzargaming/byond)';
+
+    /**
      * Converts a timestamp in ISO 8601 format to a BYOND timestamp in deciseconds.
      *
      * @param string $iso_timestamp The timestamp in ISO 8601 format to convert.
@@ -95,14 +102,16 @@ trait ByondTrait
      *
      * @param string $ckey The ckey to search for.
      * @param bool $prettyprint (Optional) Whether to pretty print the JSON response. Default is true.
+     * @param string $userAgent (Optional) The User-Agent header to send with the request. Default is self::DEFAULT_USER_AGENT.
      * @return string|false The JSON response as a string if successful, false otherwise.
      */
-    public static function bansearch_centcom(string $ckey, bool $prettyprint = true): string|false
+    public static function bansearch_centcom(string $ckey, bool $prettyprint = true, string $userAgent = self::DEFAULT_USER_AGENT): string|false
     {
         $ch = curl_init(self::CENTCOM_URL . '/ban/search/' . urlencode($ckey));
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPGET => true,
+            CURLOPT_USERAGENT => $userAgent,
             CURLOPT_TIMEOUT => 5,
             CURLOPT_CONNECTTIMEOUT => 2,
         ]);
@@ -114,9 +123,9 @@ trait ByondTrait
         return $prettyprint ? json_encode($json, JSON_PRETTY_PRINT) : $response;
     }
 
-    public static function isValidCkey(string $ckey, string $page = ''): bool
+    public static function isValidCkey(string $ckey, string $page = '', string $userAgent = self::DEFAULT_USER_AGENT): bool
     {
-        if (! $page && ! $page = self::getProfilePage($ckey)) return false;
+        if (! $page && ! $page = self::getProfilePage($ckey, $userAgent)) return false;
         return self::isValidProfilePage($page);
     }
     
@@ -135,14 +144,16 @@ trait ByondTrait
      * Retrieves the profile page of a user based on their ckey.
      *
      * @param string $ckey The ckey of the user.
+     * @param string $userAgent (Optional) The User-Agent header to send with the request. Default is self::DEFAULT_USER_AGENT.
      * @return string|false The profile page content as a string, or false if the page couldn't be retrieved.
      */
-    public static function getProfilePage(string $ckey): string|false 
+    public static function getProfilePage(string $ckey, string $userAgent = self::DEFAULT_USER_AGENT): string|false 
     {
         $ch = curl_init(self::MEMBERS . urlencode($ckey) . '?format=text');
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPGET => true,
+            CURLOPT_USERAGENT => $userAgent,
             CURLOPT_TIMEOUT => 5,
             CURLOPT_CONNECTTIMEOUT => 2,
         ]);
@@ -153,55 +164,60 @@ trait ByondTrait
      * Retrieves the "key" field for a player based on their ckey.
      *
      * @param string $ckey The ckey of the player.
+     * @param string $userAgent (Optional) The User-Agent header to send with the request. Default is self::DEFAULT_USER_AGENT.
      * @return string|false The key for the player, or false if it cannot be retrieved.
      */
-    public static function getKey(string $ckey): string|false
+    public static function getKey(string $ckey, string $userAgent = self::DEFAULT_USER_AGENT): string|false
     {
-        return ($page = self::getProfilePage($ckey)) ? self::parseKey($page) : false;
+        return ($page = self::getProfilePage($ckey, $userAgent)) ? self::parseKey($page) : false;
     }
 
     /**
      * Retrieves the "gender" field for a player based on their ckey.
      *
      * @param string $ckey The ckey of the player.
+     * @param string $userAgent (Optional) The User-Agent header to send with the request. Default is self::DEFAULT_USER_AGENT.
      * @return string|false The gender for the player, or false if it cannot be retrieved.
      */
-    public static function getGender(string $ckey): string|false
+    public static function getGender(string $ckey, string $userAgent = self::DEFAULT_USER_AGENT): string|false
     {
-        return ($page = self::getProfilePage($ckey)) ? self::parseGender($page) : false;
+        return ($page = self::getProfilePage($ckey, $userAgent)) ? self::parseGender($page) : false;
     }
 
     /**
      * Retrieves the "joined" field for a player based on their ckey.
      *
      * @param string $ckey The ckey of the player.
+     * @param string $userAgent (Optional) The User-Agent header to send with the request. Default is self::DEFAULT_USER_AGENT.
      * @return string|false The joined date for the player, or false if it cannot be retrieved.
      */
-    public static function getJoined(string $ckey): string|false
+    public static function getJoined(string $ckey, string $userAgent = self::DEFAULT_USER_AGENT): string|false
     {
-        return ($page = self::getProfilePage($ckey)) ? self::parseJoined($page) : false;
+        return ($page = self::getProfilePage($ckey, $userAgent)) ? self::parseJoined($page) : false;
     }
 
     /**
      * Retrieves the "description" field for a player based on their ckey.
      *
      * @param string $ckey The ckey of the player.
+     * @param string $userAgent (Optional) The User-Agent header to send with the request. Default is self::DEFAULT_USER_AGENT.
      * @return string|false The desc for the player, or false if it cannot be retrieved.
      */
-    public static function getDesc(string $ckey): string|false
+    public static function getDesc(string $ckey, string $userAgent = self::DEFAULT_USER_AGENT): string|false
     {
-        return ($page = self::getProfilePage($ckey)) ? self::parseDesc($page) : false;
+        return ($page = self::getProfilePage($ckey, $userAgent)) ? self::parseDesc($page) : false;
     }
 
     /**
      * Retrieves the "home_page" field for a player based on their ckey.
      *
      * @param string $ckey The ckey of the player.
+     * @param string $userAgent (Optional) The User-Agent header to send with the request. Default is self::DEFAULT_USER_AGENT.
      * @return string|false The home_page for the player, or false if it cannot be retrieved.
      */
-    public static function getHomePage(string $ckey): string|false
+    public static function getHomePage(string $ckey, string $userAgent = self::DEFAULT_USER_AGENT): string|false
     {
-        return ($page = self::getProfilePage($ckey)) ? self::parseHomePage($page) : false;
+        return ($page = self::getProfilePage($ckey, $userAgent)) ? self::parseHomePage($page) : false;
     }
 
     /**
