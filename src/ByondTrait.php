@@ -40,11 +40,18 @@ trait ByondTrait
     const string PROFILE = 'https://secure.byond.com/members/-/account';
 
     /**
-     * Used to search through bans that are stored within CentCom.
+     * The base URL for the CentCom server, which is a third-party service that provides information about bans and other player-related data for BYOND games.
      *
      * @var string
      */
     const string CENTCOM_URL = 'https://centcom.melonmesa.com';
+
+    /**
+     * The URL for searching bans on the CentCom server.
+     *
+     * @var string
+     */
+    const string CENTCOM_URL_BAN_SEARCH = self::CENTCOM_URL . '/ban/search/';
 
     /**
      * The User-Agent header to send with outbound HTTP requests.
@@ -107,7 +114,7 @@ trait ByondTrait
      */
     public static function bansearch_centcom(string $ckey, bool $prettyprint = true, string $userAgent = self::DEFAULT_USER_AGENT): string|false
     {
-        $ch = curl_init(self::CENTCOM_URL . '/ban/search/' . urlencode($ckey));
+        $ch = curl_init(self::CENTCOM_URL_BAN_SEARCH . urlencode($ckey));
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPGET => true,
