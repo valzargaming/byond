@@ -56,6 +56,10 @@ echo "Description: " . $description . PHP_EOL;
 echo "Home Page: " . $homePage . PHP_EOL;
 ```
 
+## Protocol reference
+
+[PROTOCOL.md](PROTOCOL.md) collects the public documentation on BYOND's network protocols. It covers the Topic query format, with a PHP example, the client handshake and encryption, and what the BYOND Hub publishes. It cites its sources and marks what is still unknown.
+
 ## Contributing
 
 Contributions are welcome! Please submit a pull request or open an issue to discuss any changes you would like to make.
